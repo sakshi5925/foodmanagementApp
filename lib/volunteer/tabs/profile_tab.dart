@@ -4,13 +4,46 @@ import '../../receiver/screens/settings_page.dart';
 import '../models/achievement.dart';
 import '../models/contribution.dart';
 
-class VolunteerProfileTab extends StatelessWidget {
-  final String name = 'John Doe';
-  final String email = 'john.doe@example.com';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class VolunteerProfileTab extends StatefulWidget {
+  @override
+  _VolunteerProfileTab createState() => _VolunteerProfileTab();
+}
+
+class _VolunteerProfileTab extends State<VolunteerProfileTab> {
+  // final String name = 'John Doe';
+  // final String email = 'john.doe@example.com';
   final String phone = '+1 234-567-8900';
   final int tasksCompleted = 25;
   final int mealsDistributed = 1250;
   final int donationsCollected = 45;
+
+  final supabase = Supabase.instance.client;
+  User? user;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserDetails();
+  }
+
+  Future<void> _fetchUserDetails() async {
+    setState(() {
+      user = supabase.auth.currentUser;
+    });
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await supabase.auth.signOut();
+      Navigator.of(context).pushReplacementNamed('/oauth');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error signing out: $e')),
+      );
+    }
+  }
 
   // Dummy data for achievements
   final List<Achievement> achievements = [
@@ -106,14 +139,14 @@ class VolunteerProfileTab extends StatelessWidget {
           ),
           SizedBox(height: 16),
           Text(
-            name,
+            user?.userMetadata?['full_name'] ?? 'Fetching user details...',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
-            email,
+            user?.email ?? 'Fetching user details...',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[600],
@@ -394,9 +427,7 @@ class VolunteerProfileTab extends StatelessWidget {
         _buildProfileOption(
           'Logout',
           Icons.exit_to_app,
-          () {
-            Navigator.of(context).pushReplacementNamed('/login');
-          },
+          _signOut,
         ),
       ],
     );
@@ -410,4 +441,4 @@ class VolunteerProfileTab extends StatelessWidget {
       onTap: onTap,
     );
   }
-} 
+}

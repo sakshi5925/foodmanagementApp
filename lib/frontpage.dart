@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'loginpage.dart';
+import 'oauth.dart';
 
 class WasteFoodManagementApp extends StatelessWidget {
   @override
@@ -127,7 +128,8 @@ class UserSelectionPage extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage(userType: title)),
+        // MaterialPageRoute(builder: (context) => LoginPage(userType: title)),
+        MaterialPageRoute(builder: (context) => SupabaseAuthPage(userType: title)),
       ),
       child: Container(
         width: double.infinity,
